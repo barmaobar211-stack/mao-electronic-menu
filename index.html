@@ -158,6 +158,8 @@ body:before{background:radial-gradient(circle at 14% 4%,rgba(91,151,211,.24),tra
 .atmosphere-dot.is-active{width:42px;background:linear-gradient(90deg,var(--blue),var(--gold))}
 @media(max-width:720px){.atmosphere{padding-top:24px}.atmosphere-head{display:block}.atmosphere-head p{text-align:left;margin-top:10px}.atmosphere-stage{min-height:68svh}.atmo-copy{left:18px;right:18px;bottom:18px}.atmo-copy h3{font-size:38px}.atmo-mark button{width:42px;height:42px}}
 
+
+.hero-mood-rail{position:absolute;left:50%;bottom:18px;z-index:2;width:min(calc(100% - 32px),560px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:center;transform:translateX(-50%)}.hero-mood-item{position:relative;min-height:78px;overflow:hidden;border:1px solid rgba(201,224,247,.2);border-radius:18px;background:rgba(12,24,39,.58);box-shadow:0 14px 28px rgba(0,0,0,.22);transition:transform .45s var(--ease),border-color .45s ease}.hero-mood-item:hover,.hero-mood-item:focus-visible{transform:translateY(-4px);border-color:rgba(216,196,240,.58)}.hero-mood-item img{display:block;width:100%;height:100%;min-height:78px;object-fit:cover;filter:saturate(.82) contrast(.96);opacity:.82}.hero-mood-item:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(9,18,30,.04),rgba(9,18,30,.68))}.hero-mood-item span{position:absolute;left:12px;bottom:10px;z-index:1;color:#edf4fb;font-family:Georgia,"Times New Roman",serif;font-size:15px}.hero-mood-rail-label{color:#a9bdd2;font-size:9px;line-height:1.25;letter-spacing:.08em;writing-mode:vertical-rl;transform:rotate(180deg);text-align:left;white-space:nowrap}.hero{padding-bottom:116px}@media(max-width:430px){.hero-mood-rail{width:calc(100% - 20px);gap:7px;bottom:12px}.hero-mood-item{min-height:68px;border-radius:15px}.hero-mood-item img{min-height:68px}.hero-mood-item span{left:9px;bottom:8px;font-size:13px}.hero-mood-rail-label{font-size:8px}.hero{padding-bottom:104px}}
 </style>
 </head>
 <body id="top">
@@ -172,6 +174,12 @@ body:before{background:radial-gradient(circle at 14% 4%,rgba(91,151,211,.24),tra
     <p class="hero-note"><span>для долгих разговоров</span><i>·</i><span>для своих</span></p>
     <a class="primary" href="#sections">Смотреть меню <span>↓</span></a>
   </div>
+  <a class="hero-mood-rail" href="#atmosphere" aria-label="Открыть атмосферные фотографии">
+    <span class="hero-mood-item"><img src="atmosphere-cocktail.jpg" alt="Коктейль в атмосфере MAO"><span>коктейли</span></span>
+    <span class="hero-mood-item"><img src="atmosphere-hookah.jpg" alt="Кальян и дым в MAO"><span>кальян</span></span>
+    <span class="hero-mood-rail-label">листайте<br>настроение</span>
+  </a>
+
 </header>
 <nav class="sticky" aria-label="Разделы меню"><div class="sticky-inner"><a href="#sections">разделы</a><a href="#kitchen">кухня</a><a href="#bar">бар</a><a class="top" href="#top" aria-label="Наверх">↑</a></div></nav>
 <main>
