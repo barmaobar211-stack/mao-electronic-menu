@@ -135,6 +135,8 @@ body:before{background:radial-gradient(circle at 14% 4%,rgba(91,151,211,.24),tra
 @media(max-width:430px){.brand{width:min(245px,72vw)}.brand-logo{max-height:126px}}/* logo edge softening */
 .brand-logo{mask-image:radial-gradient(ellipse at 50% 50%,#000 0 38%,rgba(0,0,0,.94) 48%,transparent 76%);-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 0 38%,rgba(0,0,0,.94) 48%,transparent 76%);mix-blend-mode:screen;filter:saturate(1.16) brightness(1.3) contrast(1.05);border-radius:24%}
 .brand-fallback[hidden]{display:none!important}
+/* logo luminance mask */
+.brand-logo{mask-image:url("mao-logo.png");-webkit-mask-image:url("mao-logo.png");mask-mode:luminance;-webkit-mask-mode:luminance;mask-size:contain;-webkit-mask-size:contain;mask-repeat:no-repeat;-webkit-mask-repeat:no-repeat;mask-position:center;-webkit-mask-position:center}
 </style>
 </head>
 <body id="top">
