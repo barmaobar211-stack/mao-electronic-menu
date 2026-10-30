@@ -36,7 +36,7 @@ async function api(path,options={}){
 function toast(message,error=false){const t=$('#toast');t.textContent=message;t.className='toast show'+(error?' error':'');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),6500);}
 function modal(id){const dialog=$(id);if(!dialog.open)dialog.showModal();return dialog;}
 function closeModal(id){$(id).close();}
-function imageFallback(root=document){$$('img',root).forEach(img=>img.addEventListener('error',()=>{img.src='/assets/no-photo.svg'},{once:true}));}
+function imageFallback(root=document){$$('img',root).forEach(img=>{const fallback=()=>img.replaceWith(Object.assign(document.createElement('div'),{className:'photo-placeholder',textContent:'МАО'}));img.addEventListener('error',fallback,{once:true});if(img.complete&&!img.naturalWidth)fallback();});}
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 
 let user,orders=[],items=[],users=[],view='orders',filter='active',section='all',category='all',search='',sound=false,audio,polling=false,seen=new Set(),first=true,action,orderSignature='';
@@ -77,7 +77,7 @@ async function renderView(){ $('#view-heading').textContent=titles[view];$$('[da
  if(view==='users'){users=(await api('admin/users')).users;$('#work').innerHTML='<div class="view-title"><p class="helper">У каждого — свой вход и свои принятые заказы.<br>Администратор видит и может вести любой заказ.</p><button class="primary" id="add-user">Добавить сотрудника</button></div><div class="users-grid">'+users.map(u=>'<article class="user-card"><div class="row between"><h3>'+esc(u.name)+'</h3><span class="tag '+(!u.active?'off':'')+'">'+(u.active?'Доступ открыт':'Отключён')+'</span></div><p class="helper">'+esc(u.login)+' · '+(u.role==='owner'?'Администратор':'Сотрудник')+'</p><button data-password="'+u.id+'">Новый пароль</button> '+(u.role!=='owner'?'<button data-user-toggle="'+u.id+'">'+(u.active?'Отключить':'Включить')+'</button>':'')+'</article>').join('')+'</div>';}
  }catch(e){$('#work').innerHTML='<div class="notice">'+esc(e.message)+'</div>';}
 }
-async function start(u){user=u;$('#login').hidden=true;$('#app').hidden=false;$('#who').textContent=u.name+' · '+(u.role==='owner'?'администратор':'сотрудник');$('#users-nav').hidden=u.role!=='owner';await refresh();await renderView();}
+async function start(u){user=u;view='orders';filter='active';first=true;seen=new Set();orderSignature='';$('#login').hidden=true;$('#app').hidden=false;$('#who').textContent=u.name+' · '+(u.role==='owner'?'администратор':'сотрудник');$('#users-nav').hidden=u.role!=='owner';await refresh();if(user)await renderView();}
 $('#login-form').onsubmit=async e=>{e.preventDefault();const f=e.currentTarget,b=$('button[type=submit]',f);b.disabled=true;$('#login-error').textContent='';try{await start((await api('auth/login',{method:'POST',body:JSON.stringify(Object.fromEntries(new FormData(f)))})).user);f.reset();}catch(err){$('#login-error').textContent=err.message;}finally{b.disabled=false;}};
 $('#logout').onclick=async()=>{try{await api('auth/logout',{method:'POST',body:'{}'});location.reload();}catch(e){toast(e.message,true);}};
 $('#refresh').onclick=()=>view==='orders'?refresh():renderView();

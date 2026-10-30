@@ -51,7 +51,7 @@ async function api(path,options={}){
 function toast(message,error=false){const t=$('#toast');t.textContent=message;t.className='toast show'+(error?' error':'');clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.classList.remove('show'),6500);}
 function modal(id){const dialog=$(id);if(!dialog.open)dialog.showModal();return dialog;}
 function closeModal(id){$(id).close();}
-function imageFallback(root=document){$$('img',root).forEach(img=>img.addEventListener('error',()=>{img.src='/assets/no-photo.svg'},{once:true}));}
+function imageFallback(root=document){$$('img',root).forEach(img=>{const fallback=()=>img.replaceWith(Object.assign(document.createElement('div'),{className:'photo-placeholder',textContent:'МАО'}));img.addEventListener('error',fallback,{once:true});if(img.complete&&!img.naturalWidth)fallback();});}
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 
 const read=(key,fallback)=>{try{return JSON.parse(localStorage.getItem(key))??fallback;}catch{return fallback;}};
@@ -75,7 +75,7 @@ function render(){
  $('#category-name').textContent=category||'Меню';$('#item-count').textContent=list.length+' поз.';
  $('#dishes').innerHTML=list.map(x=>'<article class="dish"><button class="dish-image" data-dish="'+x.id+'" aria-label="'+esc(x.title)+': фото и описание">'+photo(x)+'<span class="tag '+(!x.available?'off':'')+'">'+(x.available?'Фото / описание ↻':'Сегодня нет')+'</span></button><div class="dish-copy"><h3>'+esc(x.title)+'</h3><div class="row between"><b>'+money(x.price)+'</b><button data-add="'+x.id+'" '+(!x.available?'disabled':'')+'>'+(x.available?'+ В заказ':'В стоп-листе')+'</button></div></div></article>').join('');images();
 }
-async function load(){try{items=(await api('menu')).items;$('#menu-error').hidden=true;render();}catch(e){$('#menu-error').hidden=false;$('#menu-error').textContent=e.message+' Обновите страницу, чтобы повторить.';$('#dishes').innerHTML='';}}
+async function load(required=false){try{items=(await api('menu')).items;$('#menu-error').hidden=true;render();}catch(e){$('#menu-error').hidden=false;$('#menu-error').textContent=e.message+' Обновите страницу, чтобы повторить.';if(!items.length)$('#dishes').innerHTML='';if(required)throw e;}}
 function add(id){if(pending)return toast('Сначала завершите отправку предыдущего заказа в корзине.',true);const x=item(id);if(!x?.available)return;let line=cart.find(c=>c.id===id);if(line){if(line.quantity>=20)return toast('До 20 порций одной позиции',true);line.quantity++;}else cart.push({id,quantity:1,title:x.title,price:x.price,version:x.version});counter();toast('В корзине: '+x.title);}
 function cartRender(){
  $('#cart-lines').innerHTML=cart.length?cart.map(x=>'<div class="cart-line"><div><span class="name">'+esc(x.title)+'</span><div class="small">'+money(x.price)+' за порцию'+(item(x.id)&&!item(x.id).available?' · Сейчас в стоп-листе':'')+'</div></div><b>'+money(x.price*x.quantity)+'</b><div class="row"><button data-quantity="'+x.id+'" data-delta="-1" aria-label="Уменьшить">−</button><span>'+x.quantity+'</span><button data-quantity="'+x.id+'" data-delta="1" aria-label="Увеличить">+</button><button class="quiet" data-remove="'+x.id+'">Убрать</button></div></div>').join(''):'<div class="empty"><b>Что хочется попробовать?</b>Добавьте блюда или напитки из меню.</div>';
@@ -93,7 +93,7 @@ $('#send-order').onclick=async()=>{
  if(!cart.length&&!pending)return;sending=true;$('#send-error').textContent='';cartRender();
  try{
  if(!pending){
-   await load();const changed=cart.some(x=>!item(x.id)||!item(x.id).available||item(x.id).version!==x.version);
+   await load(true);const changed=cart.some(x=>!item(x.id)||!item(x.id).available||item(x.id).version!==x.version);
    if(changed){cart=cart.map(x=>item(x.id)?{...x,title:item(x.id).title,price:item(x.id).price,version:item(x.id).version}:x);counter();throw Error('Меню изменилось. Проверьте цены и удалите недоступные позиции, затем отправьте снова.');}
    pending={table,items:cart.map(x=>({id:x.id,quantity:x.quantity,version:x.version})),note:$('#note').value.trim(),idempotencyKey:crypto.randomUUID()};save('mao-pending-v2',pending);
  }
